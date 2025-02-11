@@ -1,3 +1,5 @@
+#THIs is pactice code dont use it 
+
 from collections import defaultdict, deque
 import random
 
@@ -28,8 +30,9 @@ class Graph:
         while queue:
             v = queue.popleft()
             print(v, end=' ')
-            print("visited", v)
 
+
+            
             for neighbor in self.graph[v]:
                 if neighbor not in visited:
                     visited.add(neighbor)
