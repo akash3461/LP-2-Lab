@@ -1,72 +1,79 @@
-from collections import deque
-from typing import Deque, List
+from collections import defaultdict, deque
+from typing import List
 
 class Graph:
-    def __init__(self) -> None:
-        self.n = int(input("Enter number of nodes: "))
-        self.nodes = {i+1: [] for i in range(self.n)}
-    
-    def addEdge(self, start: int, end: int):
-        self.nodes[start].append(end)
-        self.nodes[end].append(start)
-    
-    def printGraph(self):
-        for node, adj_list in self.nodes.items():
-            print(f"{node} -> ", end="")
-            for vertex in adj_list:
-                print(vertex, end=" ")
-            print()
-    
-    # Non-recursive DFS using stack with 'visited' message after each visit
+    def __init__(self):
+        self.graph = defaultdict(list)
+
+    def add_edge(self, u: int, v: int):
+        self.graph[u].append(v)
+        self.graph[v].append(u)  # Since it's an undirected graph
+
+    def print_graph(self):
+        for node in self.graph:
+            print(f"{node} -> {', '.join(map(str, self.graph[node]))}")
+
+    # Non-recursive DFS using stack
     def dfs(self, start: int):
-        visited = [False] * (self.n + 1)
+        visited = set()
         stack = [start]
-        visited_nodes = []  # List to store visited nodes
-        print(f"DFS from {start}: ")
+        visited_nodes = []
+
+        print(f"\nDFS from {start}:")
 
         while stack:
             current = stack.pop()
-            if not visited[current]:
-                visited[current] = True
-                visited_nodes.append(current)  # Add visited node to the list
+            if current not in visited:
+                visited.add(current)
+                visited_nodes.append(current)
                 print(f"{current} visited")
-                # Add unvisited adjacent nodes to the stack
-                for adjacentNode in reversed(self.nodes[current]):
-                    if not visited[adjacentNode]:
-                        stack.append(adjacentNode)
+                # Add unvisited adjacent nodes to the stack (in reverse order for correct DFS order)
+                for adjacent in reversed(self.graph[current]):
+                    if adjacent not in visited:
+                        stack.append(adjacent)
         
-        # Print the list of all visited nodes at the end of DFS
         print(f"Visited nodes: {visited_nodes}")
         print("DFS traversal complete!\n")
-    
-    # BFS with 'visited' message after each visit
+
+    # BFS using queue
     def bfs(self, start: int):
-        visited = [False] * (self.n + 1)
+        visited = set()
         queue = deque([start])
-        visited[start] = True
-        visited_nodes = []  # List to store visited nodes
-        print(f"BFS from {start}: ")
+        visited.add(start)
+        visited_nodes = []
+
+        print(f"\nBFS from {start}:")
 
         while queue:
             current = queue.popleft()
-            visited_nodes.append(current)  # Add visited node to the list
+            visited_nodes.append(current)
             print(f"{current} visited")
-            for adjacentNode in self.nodes[current]:
-                if not visited[adjacentNode]:
-                    queue.append(adjacentNode)
-                    visited[adjacentNode] = True
+
+            for adjacent in self.graph[current]:
+                if adjacent not in visited:
+                    queue.append(adjacent)
+                    visited.add(adjacent)
         
-        # Print the list of all visited nodes at the end of BFS
         print(f"Visited nodes: {visited_nodes}")
         print("BFS traversal complete!\n")
 
+# Taking input from user
 g = Graph()
-g.addEdge(1, 2)
-g.addEdge(1, 3)
-g.addEdge(1, 4)
-g.addEdge(5, 2)
-g.addEdge(5, 3)
-g.addEdge(5, 4)
-g.printGraph()
-g.dfs(3)
-g.bfs(1)
+num_nodes = int(input("Enter the number of nodes: "))
+num_edges = int(input("Enter the number of edges: "))
+
+print("Enter edges (u v) one by one:")
+for _ in range(num_edges):
+    u, v = map(int, input().split())
+    g.add_edge(u, v)
+
+g.print_graph()
+
+# Asking for start node
+start_node = int(input("Enter the starting node for traversal: "))
+
+print("\nDFS Traversal:")
+g.dfs(start_node)
+
+print("\nBFS Traversal:")
+g.bfs(start_node)
